@@ -1,0 +1,9 @@
+# Build
+bin/
+obj/
+
+# user files
+*.user
+*.suo
+*.userosscache
+*.slndocstates
