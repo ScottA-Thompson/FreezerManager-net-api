@@ -7,3 +7,23 @@ obj/
 *.suo
 *.userosscache
 *.slndocstates
+
+# Entity Framework migrations 
+Migrations/
+
+# ASP.NET Core environment settings
+appsettings.Development.json
+appsettings.*.json
+
+# Dotnet-specific files
+*.db
+*.db-journal
+*.pdb
+*.cache
+*.log
+*.vspscc
+*.vssscc
+
+# Dependency directories
+node_modules/
+packages/
