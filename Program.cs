@@ -1,5 +1,6 @@
 using FreezerManager.Data;
 using Microsoft.EntityFrameworkCore;
+using FreezerManager.Endpoints;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapMeatItemEndpoints();
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
 

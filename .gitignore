@@ -27,3 +27,6 @@ appsettings.*.json
 # Dependency directories
 node_modules/
 packages/
+
+# Because I might try Ride
+.idea/
