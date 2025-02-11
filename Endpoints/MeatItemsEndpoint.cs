@@ -24,7 +24,7 @@ namespace FreezerManager.Endpoints
             //Update All, Decision: Only use for correcting errors?
             app.MapPut("/api/meatitems/{id}", async (int id, MeatItem updatedItem, AppDbContext db) =>
             {
-               var meatItem = await db.MeatItens,FindAsync(id);
+               var meatItem = await db.MeatItems.FindAsync(id);
                if(meatItem is null) return Results.NotFound();
 
                meatItem.Type = updatedItem.Type;
@@ -40,13 +40,13 @@ namespace FreezerManager.Endpoints
             //Decision: Delete or change storange once used?
             app.MapDelete("api/meatitems/{id}", async (int id, AppDbContext db) =>
             { 
-               var meatItem = await db.MeatItens,FindAsync(id);
+               var meatItem = await db.MeatItems.FindAsync(id);
                if(meatItem is null) return Results.NotFound();
 
                db.MeatItems.Remove(meatItem);
                await db.SaveChangesAsync();
                return Results.NoContent();
-            })
+            });
         }
     }
 }

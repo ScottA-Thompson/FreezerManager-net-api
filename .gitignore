@@ -28,5 +28,9 @@ appsettings.*.json
 node_modules/
 packages/
 
+#Db Files
+*.db-shm
+*.db-wal
+
 # Because I might try Ride
 .idea/
