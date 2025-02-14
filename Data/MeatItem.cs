@@ -13,7 +13,8 @@ namespace FreezerManager.Models
         public string Cut {get; set;} 
         [Range(1, double.MaxValue, ErrorMessage = "Weight must be greater than 0")]
         public double Weight {get; set;} 
-        public string Storage {get; set;}
+        [Required]
+        public StorageLocation Storage {get; set;} = StorageLocation.Freezer;
         public DateTime DateAdded {get; set;} = DateTime.Now;
     }
 }

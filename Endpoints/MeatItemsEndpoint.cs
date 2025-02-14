@@ -9,7 +9,9 @@ namespace FreezerManager.Endpoints
         public static void MapMeatItemEndpoints(this IEndpointRouteBuilder app)
         {
              app.MapGet("/api/MeatItems", async (AppDbContext db) => 
-                    await db.MeatItems.ToListAsync());
+                    await db.MeatItems
+                    .Where(item => item.Storage != StorageLocation.Consumed) 
+                    .ToListAsync());
 
             app.MapGet("api/MeatItems/{id}", async (int id, AppDbContext db) =>
                     await db.MeatItems.FindAsync(id) is MeatItem item ? Results.Ok(item) : Results.NotFound());
