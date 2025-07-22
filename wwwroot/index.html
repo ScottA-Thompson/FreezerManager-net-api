@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freezer Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .inventory {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .inventory-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .filter-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .item-details {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-consume {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-move {
+            background: #059669;
+            color: white;
+        }
+        
+        .add-form {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .add-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.login-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    text-align: center;
+}
+
+.login-modal h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: #2980b9;
+}
+
+.login-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.login-error {
+    color: #e74c3c;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Hide main content when not authenticated */
+.main-content {
+    display: none;
+}
+
+.main-content.show {
+    display: block;
+}
+
+/* Logout button for header */
+.logout-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+    </style>
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+    <div class="login-modal">
+        <h2>🔒 Family Access</h2>
+        <p style="margin-bottom: 20px; color: #7f8c8d; font-size: 14px;">
+            Enter your family PIN to access the freezer manager
+        </p>
+        <input type="password" id="pinInput" class="login-input" placeholder="Enter PIN" maxlength="6">
+        <button id="loginButton" class="login-button">Enter</button>
+        <div id="loginError" class="login-error"></div>
+    </div>
+</div>
+<div class="main-content" id="mainContent">
+    <div class="container">
+        <div class="header">
+             <button id="logoutButton" class="logout-button">Logout</button>
+            <h1>🥩 Freezer Manager</h1>
+            <div id="lastUpdated">Loading...</div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalItems">-</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalWeight">-</div>
+                <div class="stat-label">Total kg</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueTypes">-</div>
+                <div class="stat-label">Types</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="toggleAddForm()">Add Item</button>
+            <button class="btn btn-secondary" onclick="refreshData()">Refresh</button>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="addForm" class="add-form">
+            <h3 style="margin-bottom: 15px;">Add New Item</h3>
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <input type="text" id="itemType" class="form-input" placeholder="e.g., Beef, Pork, Chicken" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cut</label>
+                <input type="text" id="itemCut" class="form-input" placeholder="e.g., Ribeye, Chops, Breast" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Weight (grams)</label>
+                <input type="number" id="itemWeight" class="form-input" placeholder="e.g., 450" min="1" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Storage Location</label>
+                <select id="itemStorage" class="form-input">
+                    <option value="0">Freezer</option>
+                    <option value="1">Fridge</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="addItem()">Add Item</button>
+                <button class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+            </div>
+        </div>
+        
+        <div class="inventory">
+            <div class="inventory-header">
+                <h3>Inventory</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterItems('all')">All</button>
+                    <button class="filter-btn" onclick="filterItems('Freezer')">Freezer</button>
+                    <button class="filter-btn" onclick="filterItems('Fridge')">Fridge</button>
+                </div>
+            </div>
+            <div id="inventory" class="loading">
+                Loading inventory...
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        // Configuration
+         const API_BASE = 'http://freezer.a-thompson.dk/api';
+        //const API_BASE = 'http://localhost:5123/api';
+        const STORAGE_NAMES = ['Freezer', 'Fridge', 'Consumed'];
+        
+        // State
+        let items = [];
+        let currentFilter = 'all';
+        let isAuthenticated = false;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadItems();
+        });
+        
+async function checkAuthStatus() {
+    try {
+        const response = await fetch(`${API_BASE}/auth/status`);
+        const data = await response.json();
+        isAuthenticated = data.authenticated;
+        
+        if (isAuthenticated) {
+            showMainContent();
+        } else {
+            showLoginOverlay();
+        }
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        showLoginOverlay();
+    }
+}
+
+async function login(pin) {
+    try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pin: pin }),
+        });
+
+        if (response.ok) {
+            isAuthenticated = true;
+            showMainContent();
+            await loadItems();
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+    }
+}
+
+async function logout() {
+    try {
+        await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+    isAuthenticated = false;
+    showLoginOverlay();
+}
+
+function showLoginOverlay() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('mainContent').classList.remove('show');
+    document.getElementById('pinInput').focus();
+}
+
+function showMainContent() {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainContent').classList.add('show');
+}
+document.getElementById('loginButton').addEventListener('click', async () => {
+    const pin = document.getElementById('pinInput').value;
+    const loginButton = document.getElementById('loginButton');
+    const errorDiv = document.getElementById('loginError');
+    
+    if (!pin) {
+        errorDiv.textContent = 'Please enter your PIN';
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = 'Checking...';
+    errorDiv.textContent = '';
+
+    const success = await login(pin);
+    
+    if (!success) {
+        errorDiv.textContent = 'Invalid PIN. Please try again.';
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+    }
+
+    loginButton.disabled = false;
+    loginButton.textContent = 'Enter';
+});
+
+document.getElementById('pinInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('loginButton').click();
+    }
+});
+
+document.getElementById('logoutButton').addEventListener('click', logout);
+
+        // API Functions
+        async function loadItems() {
+            try {
+                  const response = await fetch(`${API_BASE}/MeatItems`);
+                if (response.status === 401) {
+                    showLoginOverlay();
+            return;
+        }
+                if (!response.ok) throw new Error('Failed to load items');
+                
+                items = await response.json();
+                updateStats();
+                renderItems();
+                hideError();
+                
+                document.getElementById('lastUpdated').textContent = 
+                    `Updated: ${new Date().toLocaleTimeString()}`;
+            } catch (error) {
+                showError('Failed to load inventory: ' + error.message);
+            }
+        }
+        
+        async function addItem() {
+            const type = document.getElementById('itemType').value.trim();
+            const cut = document.getElementById('itemCut').value.trim();
+            const weight = parseFloat(document.getElementById('itemWeight').value);
+            const storage = parseInt(document.getElementById('itemStorage').value);
+            
+            if (!type || !cut || !weight || weight <= 0) {
+                showError('Please fill in all fields with valid values');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/MeatItems`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        cut: cut,
+                        weight: weight,
+                        storage: storage
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to add item');
+                
+                // Clear form and refresh
+                document.getElementById('itemType').value = '';
+                document.getElementById('itemCut').value = '';
+                document.getElementById('itemWeight').value = '';
+                document.getElementById('itemStorage').value = '0';
+                
+                toggleAddForm();
+                loadItems();
+                hideError();
+            } catch (error) {
+                showError('Failed to add item: ' + error.message);
+            }
+        }
+        
+        async function consumeItem(id) {
+            if (!confirm('Mark this item as consumed?')) return;
+            
+            try {
+                const item = items.find(i => i.id === id);
+                const response = await fetch(`${API_BASE}/MeatItems/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...item,
+                        storage: 2 // Consumed
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to update item');
+                
+                loadItems();
+                hideError();
+            } catch (error) {
+                showError('Failed to update item: ' + error.message);
+            }
+        }
+        
+        async function moveItem(id) {
+            try {
+                const item = items.find(i => i.id === id);
+                const newStorage = item.storage === 0 ? 1 : 0; // Toggle between Freezer and Fridge
+                
+                const response = await fetch(`${API_BASE}/MeatItems/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...item,
+                        storage: newStorage
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to move item');
+                
+                loadItems();
+                hideError();
+            } catch (error) {
+                showError('Failed to move item: ' + error.message);
+            }
+        }
+        
+        // UI Functions
+        function updateStats() {
+            const totalItems = items.length;
+            const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+            const uniqueTypes = new Set(items.map(item => item.type)).size;
+            
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalWeight').textContent = (totalWeight / 1000).toFixed(1);
+            document.getElementById('uniqueTypes').textContent = uniqueTypes;
+        }
+        
+        function renderItems() {
+            const container = document.getElementById('inventory');
+            const filteredItems = currentFilter === 'all' 
+                ? items 
+                : items.filter(item => STORAGE_NAMES[item.storage] === currentFilter);
+            
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<div class="loading">No items found</div>';
+                return;
+            }
+            
+            container.innerHTML = filteredItems.map(item => `
+                <div class="item">
+                    <div class="item-info">
+                        <div class="item-title">${item.type} ${item.cut}</div>
+                        <div class="item-details">
+                            ${item.weight}g • ${STORAGE_NAMES[item.storage]} • 
+                            Added ${new Date(item.dateAdded).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-small btn-move" onclick="moveItem(${item.id})">
+                            Move
+                        </button>
+                        <button class="btn-small btn-consume" onclick="consumeItem(${item.id})">
+                            Use
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterItems(filter) {
+            currentFilter = filter;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderItems();
+        }
+        
+        function toggleAddForm() {
+            const form = document.getElementById('addForm');
+            form.classList.toggle('active');
+            
+            if (form.classList.contains('active')) {
+                document.getElementById('itemType').focus();
+            }
+        }
+        
+        function refreshData() {
+            loadItems();
+        }
+        
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+        checkAuthStatus();
+    </script>
+</body>
+</html>
