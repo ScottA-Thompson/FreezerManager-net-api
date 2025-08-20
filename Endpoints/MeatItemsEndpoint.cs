@@ -1,5 +1,6 @@
 using FreezerManager.Models;
 using FreezerManager.Data;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreezerManager.Endpoints
@@ -13,7 +14,7 @@ namespace FreezerManager.Endpoints
                     .Where(item => item.Storage != StorageLocation.Consumed) 
                     .ToListAsync());
 
-            app.MapGet("api/MeatItems/{id}", async (int id, AppDbContext db) =>
+            app.MapGet("/api/MeatItems/{id}", async (int id, AppDbContext db) =>
                     await db.MeatItems.FindAsync(id) is MeatItem item ? Results.Ok(item) : Results.NotFound());
 
             app.MapPost("/api/MeatItems", async (MeatItem meatItem, AppDbContext db) =>
@@ -40,7 +41,7 @@ namespace FreezerManager.Endpoints
             });
 
             //Decision: Delete or change storage once used?
-            app.MapDelete("api/MeatItems/{id}", async (int id, AppDbContext db) =>
+            app.MapDelete("/api/MeatItems/{id}", async (int id, AppDbContext db) =>
             { 
                var meatItem = await db.MeatItems.FindAsync(id);
                if(meatItem is null) return Results.NotFound();
