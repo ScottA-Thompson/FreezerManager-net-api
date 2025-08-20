@@ -20,7 +20,7 @@ namespace FreezerManager.Endpoints
             {
                 db.MeatItems.Add(meatItem);
                 await db.SaveChangesAsync();
-                return Results.Created($"/api/meatitems/{meatItem.Id}", meatItem);
+                return Results.Created($"/api/MeatItems/{meatItem.Id}", meatItem);
             });    
 
             //Update All, Decision: Only use for correcting errors?
@@ -39,7 +39,7 @@ namespace FreezerManager.Endpoints
 
             });
 
-            //Decision: Delete or change storange once used?
+            //Decision: Delete or change storage once used?
             app.MapDelete("api/MeatItems/{id}", async (int id, AppDbContext db) =>
             { 
                var meatItem = await db.MeatItems.FindAsync(id);
